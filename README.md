@@ -1,27 +1,32 @@
-# High Gas Agent
+# UUPS Agent
+
+- https://github.com/hack3r-0m/oz-uups-forta-agent
 
 ## Description
 
-This agent detects transactions with high gas consumption
+This agent detects malicious transactions to un-initialized UUPS proxy of openzeppelin. (See https://forum.openzeppelin.com/t/uupsupgradeable-vulnerability-post-mortem/15680/8 for more info regarding vulnerability)
 
-## Supported Chains
+It is important to distinguish between UUPS proxy and Transpararent Upgradable proxy (since they both emit Upgraded event with same signature) to reduce false positives. Hence, agent checks for owner slot which Transpararent Upgradable proxy uses, if slot is empty, it is UUPS proxy.
 
-- Ethereum
-- List any other chains this agent can support e.g. BSC
+Agent reports finding with high confidence when both "Upgraded" event & "AdminChanged" are emitted in single transaction as there is very high possibility it is an exploit.
+
+Checking for code size to be 0 will not work as `handleTransaction` is triggered while exploit transaction is in pending state and can result in ambiguity.
 
 ## Alerts
 
-Describe each of the type of alerts fired by this agent
+- OZ-UUPS-01
+  - When Upgraded event is emitted and proxy is idenfied to be UUPS (and not Transparent Upgradable)
+  - Type is set to "suspicious"
+  - Severity is set to "unknown"
+  - metadata includes new implementation along with transaction hash
 
-- FORTA-1
-  - Fired when a transaction consumes more gas than 1,000,000 gas
-  - Severity is always set to "medium" (mention any conditions where it could be something else)
-  - Type is always set to "suspicious" (mention any conditions where it could be something else)
-  - Mention any other type of metadata fields included with this alert
+- OZ-UUPS-02
+  - When Upgraded and AdminChanged events are emitted and proxy is idenfied to be UUPS (and not Transparent Upgradable)
+  - Type is set to "exploit"
+  - Severity is set to "critical"
+  - metadata includes new implementation, new owner & transaction hash
 
 ## Test Data
 
-The agent behaviour can be verified with the following transactions:
+- Complete test coverage including false positives and corner cases (see `agent.spec.ts`)
 
-- 0x1b71dcc24657989f920d627c7768f545d70fcb861c9a05824f7f5d056968aeee (1,094,700 gas)
-- 0x8df0579bf65e859f87c45b485b8f1879c56bc818043c3a0d6870c410b5013266 (2,348,226 gas)

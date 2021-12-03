@@ -41,4 +41,5 @@ dist/**/*
 yarn.lock
 
 forta.config.json
+.forta
 vscode
