@@ -30,3 +30,7 @@ Checking for code size to be 0 will not work as `handleTransaction` is triggered
 
 - Complete test coverage including false positives and corner cases (see `agent.spec.ts`)
 
+## Agent in Action!
+
+- https://explorer.forta.network/alert/0x9aa8c2f025f93fadefdb5d825ad14b95be4d05cce3df1922732ad5f4d27f094c
+
